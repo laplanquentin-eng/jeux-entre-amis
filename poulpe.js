@@ -7,7 +7,7 @@ const TM = {
   turn: FAST ? 300 : 45000, off: FAST ? 40 : 5000, trick: FAST ? 30 : 1900,
   wheel: FAST ? 60 : 6800, round: FAST ? 120 : 12000, tie: FAST ? 100 : 11000
 };
-const MAXP = 8, MINP = 2, NUMS = 60, DECK = 64; // 1..60 = nombres ; 61..64 = Poulpes
+const MAXP = 20, MINP = 2, NUMS = 60, DECK = 64; // 1..60 = nombres ; 61..64 = Poulpes
 
 const wss = new WebSocketServer({ noServer: true, maxPayload: 4096 });
 const rooms = new Map();
@@ -57,7 +57,7 @@ class Room {
     let p = token ? this.players.find(x => x.token === token) : null;
     if (p) { p.ws = ws; p.connected = true; p.left = false; return p; }
     if (this.inGame) return { error: 'La partie a déjà commencé' };
-    if (this.players.length >= MAXP) return { error: 'La table est pleine (8 joueurs max)' };
+    if (this.players.length >= MAXP) return { error: 'La table est pleine (20 joueurs max)' };
     name = (name || 'Joueur').trim().slice(0, 16) || 'Joueur';
     const base = name; let k = 2;
     while (this.players.some(x => x.name === name)) name = base + ' ' + k++;

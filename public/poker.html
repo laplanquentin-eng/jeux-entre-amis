@@ -59,6 +59,14 @@
   .seat .hd{font-size:11px;color:#b8ffd0;font-weight:700}
   .seat .tm{height:4px;background:#0b1a12;border-radius:2px;margin-top:3px;overflow:hidden}
   .seat .tm i{display:block;height:100%;background:var(--gold);width:100%}
+  #felt.many{aspect-ratio:1.2/1;min-height:640px}
+  #felt.many .seat{min-width:60px}
+  #felt.many .seat .nm{font-size:11px;max-width:74px}
+  #felt.many .seat .ch,#felt.many .seat .tag,#felt.many .seat .hd{font-size:10px}
+  #felt.many .seat .cards{--cw:20px;min-height:30px}
+  #felt.many .seat.me .cards{--cw:34px;min-height:48px}
+  #felt.many .seat .box{padding:3px 5px}
+
   .dbtn{display:inline-block;background:#fff;color:#111;border-radius:50%;width:18px;height:18px;line-height:18px;font-size:11px;font-weight:800;margin-left:4px}
   .bet{position:absolute;transform:translate(-50%,-50%);background:rgba(0,0,0,.55);border:1px solid #e0a800;color:var(--gold);border-radius:14px;padding:2px 9px;font-size:12px;font-weight:800;white-space:nowrap}
   #banner{margin:10px 0 0;min-height:24px;text-align:center;font-weight:700;color:#b8ffd0}
@@ -87,7 +95,7 @@
 <div id="lobby">
   <p style="margin:0 0 10px"><a href="/" style="color:var(--mut)">← Tous les jeux</a></p>
   <h1>♠ Poker entre amis ♥</h1>
-  <p class="sub">Texas Hold'em en ligne · 2 à 9 joueurs · jetons fictifs</p>
+  <p class="sub">Texas Hold'em en ligne · 2 à 20 joueurs · jetons fictifs</p>
   <div class="card-panel">
     <label for="name">Ton pseudo</label>
     <input id="name" maxlength="16" placeholder="Maeva" autocomplete="off">
@@ -232,6 +240,7 @@ function render() {
   $('board').innerHTML = b;
 
   const n = s.players.length, mi = Math.max(0, s.players.findIndex(p => p.id === s.you));
+  $('felt').classList.toggle('many', n > 8);
   let seats = '';
   s.players.forEach((p, k) => {
     const rel = (k - mi + n) % n, a = (90 + rel * 360 / n) * Math.PI / 180;
@@ -261,7 +270,7 @@ function render() {
   $('banner').innerHTML = ban;
 
   // liste des joueurs
-  $('plist').innerHTML = '<b>Joueurs (' + n + '/9)</b><br>' + s.players.map(p =>
+  $('plist').innerHTML = '<b>Joueurs (' + n + '/20)</b><br>' + s.players.map(p =>
     (p.id === s.hostId ? '👑 ' : '• ') + esc(p.name) + ' — ' + p.chips + (p.connected ? '' : ' (hors ligne)')).join('<br>') +
     '<div style="color:var(--mut);margin-top:6px;font-size:12px">Blinds ' + s.blinds[0] + ' / ' + s.blinds[1] + '</div>';
   const lg = $('log'); const atEnd = lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 30;

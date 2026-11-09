@@ -6,7 +6,7 @@ const crypto = require('crypto');
 const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 3000;
-const START_CHIPS = 1000, SB = 10, BB = 20, MAX_SEATS = 9;
+const START_CHIPS = 1000, SB = 10, BB = 20, MAX_SEATS = 20;
 const FAST = !!process.env.POKER_FAST; // pour les tests automatiques
 const TURN_MS = FAST ? 400 : 30000, DISCONNECTED_TURN_MS = 6000, NEXT_HAND_MS = FAST ? 30 : 8000, STREET_MS = FAST ? 10 : 1400;
 

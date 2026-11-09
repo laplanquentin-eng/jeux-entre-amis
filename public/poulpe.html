@@ -46,6 +46,12 @@
   .seat.turn .box{border-color:var(--gold);box-shadow:0 0 14px rgba(255,210,63,.7)}
   .seat.win .box{border-color:#58ff9b;box-shadow:0 0 18px rgba(88,255,155,.8)}
   .seat.off{opacity:.5}
+  #felt.many{aspect-ratio:1.2/1;min-height:640px;border-radius:50%}
+  #felt.many .seat{min-width:58px}
+  #felt.many .seat .nm{font-size:11px;max-width:74px}
+  #felt.many .seat .st{font-size:10px}
+  #felt.many .seat .box{padding:3px 5px}
+
   .seat .dl{display:inline-block;background:var(--acc);color:#2a0016;border-radius:8px;font-size:10px;font-weight:800;padding:1px 5px;margin-left:4px}
   .bars{display:flex;gap:4px;justify-content:center;min-height:14px;margin-top:2px;flex-wrap:wrap}
   .g{display:inline-flex;gap:2px;align-items:flex-end}
@@ -96,7 +102,7 @@
 <div id="lobby">
   <p style="margin:0 0 10px"><a href="/">← Tous les jeux</a></p>
   <h1>🐙 Poulpe</h1>
-  <p class="sub">Jeu de plis entre amis · 2 à 8 joueurs · annonce tes plis, tiens ta promesse !</p>
+  <p class="sub">Jeu de plis entre amis · 2 à 20 joueurs · annonce tes plis, tiens ta promesse !</p>
   <div class="cp"><label for="name">Ton pseudo</label><input id="name" maxlength="16" placeholder="Maeva" autocomplete="off"></div>
   <div class="cp"><button class="primary" id="btnCreate" style="width:100%">Créer une table</button></div>
   <div class="cp">
@@ -208,6 +214,7 @@ function nameOf(id) { const p = state && state.players.find(x => x.id === id); r
 function render() {
   const s = state; if (!s) return;
   const n = s.players.length, mi = Math.max(0, s.players.findIndex(p => p.id === s.you));
+  $('felt').classList.toggle('many', n > 8);
   const inGame = s.phase !== 'lobby';
   // infos
   $('info').innerHTML = inGame ?
@@ -231,7 +238,7 @@ function render() {
   });
   $('seats').innerHTML = h;
   // liste + log
-  $('plist').innerHTML = '<b>Joueurs (' + n + '/8)</b><br>' + s.players.map(p => (p.id === s.hostId ? '👑 ' : '• ') + esc(p.name) + (inGame ? ' — ' + p.bars + ' barre' + (p.bars > 1 ? 's' : '') : '') + (p.connected ? '' : ' (hors ligne)')).join('<br>');
+  $('plist').innerHTML = '<b>Joueurs (' + n + '/20)</b><br>' + s.players.map(p => (p.id === s.hostId ? '👑 ' : '• ') + esc(p.name) + (inGame ? ' — ' + p.bars + ' barre' + (p.bars > 1 ? 's' : '') : '') + (p.connected ? '' : ' (hors ligne)')).join('<br>');
   const lg = $('log'), atEnd = lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 30;
   lg.innerHTML = s.log.map(l => '<div>' + esc(l) + '</div>').join(''); if (atEnd) lg.scrollTop = 1e9;
   // main
@@ -265,7 +272,7 @@ function renderActions(s, me) {
   const box = $('actions'), isHost = s.you === s.hostId;
   let h = '';
   if (s.phase === 'lobby') {
-    h = '<div><b>Salle d\'attente</b> — partage le code <b>' + esc(s.code) + '</b> ou le lien d\'invitation (2 à 8 joueurs).</div>';
+    h = '<div><b>Salle d\'attente</b> — partage le code <b>' + esc(s.code) + '</b> ou le lien d\'invitation (2 à 20 joueurs).</div>';
     if (isHost) {
       h += '<div class="row" style="margin-top:10px"><div><label for="nr">Nombre de manches (1 à 30)</label><input id="nr" type="number" min="1" max="30" value="' + s.totalRounds + '"></div>' +
         '<button class="primary" id="bStart"' + (s.players.length < 2 ? ' disabled' : '') + ' style="align-self:flex-end">Lancer la partie</button></div>';
