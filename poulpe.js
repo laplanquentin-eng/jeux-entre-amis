@@ -30,6 +30,10 @@ function genCode() {
 }
 // valeur d'une carte jouée : Poulpe haut = 100 (bat tout), Poulpe bas = 0 (perd contre tout nombre)
 function trickWinnerIdx(trick) {
+  // Poulpes joués en « plus » (grand) : le DERNIER posé gagne toujours
+  let lastH = -1;
+  trick.forEach((t, i) => { if (t.card > NUMS && t.mode === 'H') lastH = i; });
+  if (lastH >= 0) return lastH;
   let best = -1, bi = 0;
   trick.forEach((t, i) => {
     const v = t.card <= NUMS ? t.card : (t.mode === 'H' ? 100 : 0);
@@ -44,7 +48,7 @@ class Room {
     this.phase = 'lobby'; // lobby | wheel | choose | bid | play | trickEnd | roundEnd | tiebreak | over
     this.totalRounds = 10; this.round = 0; this.dealer = -1; this.nCards = 0;
     this.turn = -1; this.trick = []; this.trickWinner = null; this.results = null;
-    this.tiebreak = null; this.loser = null; this.wheel = null; this.wheelSeq = 0;
+    this.tiebreak = null; this.loser = null; this.finalNum = null; this.wheel = null; this.wheelSeq = 0;
     this.deadline = 0; this.log = []; this.timer = null; this.hold = null; this.lastSeen = Date.now();
   }
   say(m) { this.log.push(m); if (this.log.length > 40) this.log.shift(); }
@@ -84,7 +88,7 @@ class Room {
       players: this.players.map(p => ({ id: p.id, name: p.name, connected: p.connected && !p.left, bid: p.bid, won: p.won, bars: p.bars, cards: p.hand.length })),
       hand: [...me.hand].sort((a, b) => a - b),
       trick: this.trick.map(t => ({ pid: t.pid, card: t.card, mode: t.mode })), trickWinner: this.trickWinner,
-      forbidden, wheel: this.wheel, results: this.results, tiebreak: this.tiebreak, loser: this.loser,
+      forbidden, wheel: this.wheel, results: this.results, tiebreak: this.tiebreak, loser: this.loser, finalNum: this.finalNum,
       log: this.log.slice(-12)
     };
   }
@@ -94,15 +98,29 @@ class Room {
   }
 
   // ----- déroulement -----
-  spinWheel(title, names, ids, winnerIdx) {
-    this.wheel = { id: ++this.wheelSeq, title, names, ids, winner: winnerIdx };
+  spinWheel(title, names, ids, winnerIdx, final) {
+    this.wheel = { id: ++this.wheelSeq, title, names, ids, winner: winnerIdx, final: !!final };
+  }
+  // Roue finale de 1 à 30 : toujours tournée à la fin de la partie, qu'il y ait 1 ou plusieurs perdants au départ
+  finalWheel(loserId) {
+    const name = this.players.find(p => p.id === loserId).name;
+    const w = rnd(30);
+    this.phase = 'final';
+    this.spinWheel(name + ' : roue de 1 à 30', Array.from({ length: 30 }, (_, i) => String(i + 1)), [], w, true);
+    this.say('Roue finale de 1 à 30 pour ' + name + '…');
+    this.broadcast();
+    this.later(TM.tie, () => {
+      this.finalNum = w + 1; this.wheel = null;
+      this.say(name + ' tire le ' + this.finalNum + ' !');
+      this.phase = 'over'; this.broadcast();
+    });
   }
   start() {
     if (this.phase !== 'lobby' || this.players.length < MINP) return;
     clearTimeout(this.timer);
     this.round = 0; this.dealer = -1;
     for (const p of this.players) { p.bars = 0; p.hand = []; p.bid = null; p.won = 0; }
-    this.results = null; this.tiebreak = null; this.loser = null;
+    this.results = null; this.tiebreak = null; this.loser = null; this.finalNum = null;
     const w = rnd(this.players.length);
     this.phase = 'wheel';
     this.spinWheel('Qui distribue en premier ?', this.players.map(p => p.name), this.players.map(p => p.id), w);
@@ -214,7 +232,7 @@ class Room {
     this.results = null; this.wheel = null;
     const max = Math.max(...this.players.map(p => p.bars));
     const tied = this.players.filter(p => p.bars === max);
-    if (tied.length === 1) { this.loser = tied[0].id; this.say(tied[0].name + ' a le plus de barres : c\'est le perdant !'); this.phase = 'over'; return this.broadcast(); }
+    if (tied.length === 1) { this.loser = tied[0].id; this.say(tied[0].name + ' a le plus de barres : c\'est le perdant !'); return this.finalWheel(this.loser); }
     // égalité : chaque joueur à égalité tire une carte ; le plus grand fait tourner la roue pour les autres
     const pool = Array.from({ length: NUMS }, (_, i) => i + 1);
     const draws = tied.map(p => ({ id: p.id, name: p.name, card: pool.splice(rnd(pool.length), 1)[0] }));
@@ -229,7 +247,7 @@ class Room {
     this.later(TM.tie, () => {
       this.loser = others[w].id; this.wheel = null;
       this.say(others[w].name + ' perd la roue : c\'est le perdant !');
-      this.phase = 'over'; this.broadcast();
+      this.finalWheel(this.loser);
     });
   }
   again() {
@@ -238,7 +256,7 @@ class Room {
     this.players = this.players.filter(p => !p.left);
     for (const p of this.players) { p.hand = []; p.bid = null; p.won = 0; p.bars = 0; }
     this.phase = 'lobby'; this.round = 0; this.dealer = -1; this.turn = -1; this.nCards = 0;
-    this.trick = []; this.results = null; this.tiebreak = null; this.loser = null; this.wheel = null;
+    this.trick = []; this.results = null; this.tiebreak = null; this.loser = null; this.finalNum = null; this.wheel = null;
     if (!this.players.some(p => p.id === this.hostId) && this.players[0]) this.hostId = this.players[0].id;
     this.say('— Nouvelle partie —');
     this.broadcast();

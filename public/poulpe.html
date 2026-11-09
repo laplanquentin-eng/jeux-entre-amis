@@ -291,6 +291,7 @@ function renderActions(s, me) {
   else if (s.phase === 'wheel') h = '<div class="msg">🎡 La roue tourne…</div>';
   else if (s.phase === 'roundEnd') h = '<div class="msg">Fin de la manche</div>';
   else if (s.phase === 'tiebreak') h = '<div class="msg">Égalité ! Départage en cours…</div>';
+  else if (s.phase === 'final') h = '<div class="msg">🎡 Roue finale de 1 à 30…</div>';
   else if (s.phase === 'over') h = '<div class="msg">Partie terminée</div>';
   box.innerHTML = h;
   box.querySelectorAll('[data-n]').forEach(b => b.onclick = () => send({ t: s.phase === 'choose' ? 'choose' : 'bid', n: +b.dataset.n }));
@@ -314,10 +315,10 @@ function showRules() {
     '<p>• Un joueur distribue : il choisit le <b>nombre de cartes</b> donné à chacun.</p>' +
     '<p>• À gauche du distributeur, chacun <b>annonce le nombre de plis</b> qu\'il va gagner. Le distributeur parle en dernier et <b>ne peut pas</b> annoncer un nombre qui rend le total des annonces égal au nombre de cartes (s\'il le faut, il doit annoncer au moins 1).</p>' +
     '<p>• On joue : le joueur à gauche du distributeur ouvre, chacun pose une carte, la plus forte gagne le pli et ouvre le pli suivant.</p>' +
-    '<p>• <b>Poulpe</b> : en le jouant, tu choisis qu\'il est la carte la plus <b>grande</b> (il bat tout) ou la plus <b>petite</b> (il perd contre tout). Si plusieurs cartes sont à égalité, la première posée gagne.</p>' +
+    '<p>• <b>Poulpe</b> : en le jouant, tu choisis qu\'il est la carte la plus <b>grande</b> (il bat tout) ou la plus <b>petite</b> (il perd contre tout). Si plusieurs Poulpes sont joués en « plus » dans le même pli, le <b>dernier Poulpe « plus » posé gagne</b>. Un Poulpe « moins » perd contre tout.</p>' +
     '<p>• Fin de manche : ceux qui n\'ont <b>pas gagné exactement</b> le nombre de plis annoncé (en plus ou en moins) prennent <b>une barre</b>.</p>' +
     '<p>• Une <b>roue</b> désigne le prochain distributeur.</p>' +
-    '<p>• Fin de partie : celui qui a le <b>plus de barres</b> perd. En cas d\'égalité, les joueurs concernés tirent une carte, et celui qui a le plus grand chiffre fait tourner la roue pour les autres.</p></div>' +
+    '<p>• Fin de partie : celui qui a le <b>plus de barres</b> perd. En cas d\'égalité, les joueurs concernés tirent une carte, et celui qui a le plus grand chiffre fait tourner la roue pour les autres. Dans tous les cas, une <b>roue de 1 à 30</b> est tournée à la fin pour le perdant.</p></div>' +
     '<button id="rx" class="primary" style="margin-top:10px">Compris !</button>');
   $('rx').onclick = closeOverlay;
 }
@@ -339,7 +340,7 @@ function handleOverlays(s) {
   // fin de partie
   if (s.phase === 'over' && s.loser && overlayKind !== 'over') {
     const rank = [...s.players].sort((a, b) => b.bars - a.bars);
-    openOverlay('over', '<h2>🏁 Fin de la partie</h2><p style="font-size:20px">😅 <b>' + esc(nameOf(s.loser)) + '</b> a perdu !</p>' +
+    openOverlay('over', '<h2>🏁 Fin de la partie</h2><p style="font-size:20px">😅 <b>' + esc(nameOf(s.loser)) + '</b> a perdu !</p>' + (s.finalNum ? '<p style="font-size:22px">🎡 Roue de 1 à 30 : <b style="color:var(--gold);font-size:34px">' + s.finalNum + '</b></p>' : '') +
       '<table class="res"><tr><th>Joueur</th><th>Barres</th></tr>' + rank.map(p => '<tr><td>' + (p.id === s.loser ? '😅 ' : '') + esc(p.name) + '</td><td>' + p.bars + '</td></tr>').join('') + '</table>' +
       (s.you === s.hostId ? '<button class="primary" id="bAgain" style="margin-top:12px">Rejouer</button>' : '<p style="color:var(--mut)">L\'hôte peut relancer une partie.</p>'));
     if ($('bAgain')) $('bAgain').onclick = () => send({ t: 'again' });
@@ -351,7 +352,7 @@ const WCOL = ['#ef476f', '#ffd166', '#06d6a0', '#118ab2', '#9b5de5', '#f78c6b', 
 function showWheel(s) {
   const w = s.wheel; const n = w.names.length;
   let extra = '';
-  if (s.tiebreak) {
+  if (s.tiebreak && !w.final) {
     extra = '<div class="draws">' + s.tiebreak.draws.map(d => '<div>' + esc(d.name) + '<br><span style="--cw:36px;display:inline-block;margin-top:4px">' + cardHTML(d.card, null, d.id === s.tiebreak.top ? 'win' : '') + '</span></div>').join('') + '</div>';
   }
   openOverlay('wheel', '<h2>🎡 ' + esc(w.title) + '</h2>' + extra + '<div id="wheelWrap"><canvas id="wc" width="320" height="320"></canvas></div><div id="wres" style="font-size:22px;font-weight:800;min-height:34px;margin-top:6px"></div>');
@@ -362,7 +363,7 @@ function showWheel(s) {
       const a0 = -Math.PI / 2 + rot + i * seg;
       ctx.beginPath(); ctx.moveTo(0, 0); ctx.arc(0, 0, 150, a0, a0 + seg); ctx.closePath();
       ctx.fillStyle = WCOL[i % WCOL.length]; ctx.fill(); ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
-      ctx.save(); ctx.rotate(a0 + seg / 2); ctx.fillStyle = '#10222b'; ctx.font = 'bold 15px system-ui'; ctx.textAlign = 'right';
+      ctx.save(); ctx.rotate(a0 + seg / 2); ctx.fillStyle = '#10222b'; ctx.font = 'bold ' + (n > 12 ? 11 : 15) + 'px system-ui'; ctx.textAlign = 'right';
       ctx.fillText(w.names[i].slice(0, 12), 138, 5); ctx.restore();
     }
     ctx.beginPath(); ctx.arc(0, 0, 14, 0, 7); ctx.fillStyle = '#fff'; ctx.fill();

@@ -4,8 +4,8 @@ Deux jeux en ligne sur le même site : chacun joue depuis son ordinateur ou son 
 Plusieurs tables en même temps, aucun compte à créer pour jouer. Aucun argent réel.
 
 - Page d'accueil : `/` (choix du jeu)
-- Poker (Texas Hold'em, 2 à 9 joueurs) : `/poker`
-- Poulpe (jeu de plis, 2 à 8 joueurs) : `/poulpe`
+- Poker (Texas Hold'em, 2 à 20 joueurs) : `/poker`
+- Poulpe (jeu de plis, 2 à 20 joueurs) : `/poulpe`
 
 ## Contenu
 - `server.js` : le serveur principal + règles du poker
@@ -51,8 +51,9 @@ Plusieurs tables en même temps, aucun compte à créer pour jouer. Aucun argent
   annoncer un nombre qui rend le total des annonces égal au nombre de cartes.
 - Le joueur à gauche du distributeur ouvre, la carte la plus forte gagne le pli et ouvre le suivant.
 - Un Poulpe se joue comme la carte la plus grande (bat tout) ou la plus petite (perd contre tout), au choix de celui qui le joue.
-  À égalité, la première carte posée gagne.
+  Si plusieurs Poulpes sont joués en « plus » dans le même pli, le dernier Poulpe « plus » posé gagne.
 - Fin de manche : ceux qui n'ont pas gagné exactement le nombre de plis annoncé prennent une barre.
   Une roue désigne le prochain distributeur.
 - Fin de partie (nombre de manches choisi par l'hôte, de 1 à 30) : celui qui a le plus de barres perd.
   En cas d'égalité, les joueurs concernés tirent une carte ; celui qui a le plus grand chiffre fait tourner la roue pour les autres.
+  Dans tous les cas, une roue de 1 à 30 est ensuite tournée pour le perdant.
