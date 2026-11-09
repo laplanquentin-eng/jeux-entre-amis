@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Jeux entre amis</title>
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%;background:radial-gradient(circle at 50% 0,#1b2a4a,#0a0f1c);color:#eef2fb;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  main{max-width:760px;margin:0 auto;padding:44px 18px}
+  h1{margin:0 0 6px;font-size:36px}
+  p.sub{color:#9fb0cc;margin:0 0 28px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+  a.game{display:block;text-decoration:none;color:inherit;border-radius:20px;padding:22px;border:1px solid rgba(255,255,255,.12);transition:transform .15s,box-shadow .15s}
+  a.game:hover{transform:translateY(-4px);box-shadow:0 12px 30px rgba(0,0,0,.45)}
+  a.poker{background:linear-gradient(145deg,#176b3a,#0b3a20)}
+  a.poulpe{background:linear-gradient(145deg,#0f5a6e,#2a2a6e)}
+  .ic{font-size:52px;line-height:1}
+  h2{margin:12px 0 6px;font-size:24px}
+  .d{color:#d4e3f0;font-size:14px;line-height:1.45}
+  .tag{display:inline-block;margin-top:12px;background:rgba(0,0,0,.35);border-radius:999px;padding:4px 12px;font-size:12px}
+  footer{margin-top:30px;color:#7f90ad;font-size:12px}
+</style>
+</head>
+<body>
+<main>
+  <h1>🎲 Jeux entre amis</h1>
+  <p class="sub">Chacun joue depuis son ordinateur ou son téléphone : crée une table, envoie le lien, c'est parti.</p>
+  <div class="grid">
+    <a class="game poker" href="/poker">
+      <div class="ic">♠ ♥</div>
+      <h2>Poker</h2>
+      <div class="d">Texas Hold'em avec jetons fictifs. Blinds, relances, tapis, pots secondaires.</div>
+      <span class="tag">2 à 9 joueurs</span>
+    </a>
+    <a class="game poulpe" href="/poulpe">
+      <div class="ic">🐙</div>
+      <h2>Poulpe</h2>
+      <div class="d">Jeu de plis : annonce combien de plis tu vas gagner, puis tiens ta promesse. Cartes de 1 à 60 et 4 Poulpes jokers.</div>
+      <span class="tag">2 à 8 joueurs</span>
+    </a>
+  </div>
+  <footer>Jeux gratuits entre amis · aucun argent réel</footer>
+</main>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "name": "poker-entre-amis",
+  "version": "1.0.0",
+  "description": "Poker Texas Hold'em en ligne entre amis (jetons fictifs)",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "ws": "^8.18.0" }
+}
