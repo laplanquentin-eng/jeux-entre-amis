@@ -316,8 +316,8 @@ function showRules() {
     '<p>• À gauche du distributeur, chacun <b>annonce le nombre de plis</b> qu\'il va gagner. Le distributeur parle en dernier et <b>ne peut pas</b> annoncer un nombre qui rend le total des annonces égal au nombre de cartes (s\'il le faut, il doit annoncer au moins 1).</p>' +
     '<p>• On joue : le joueur à gauche du distributeur ouvre, chacun pose une carte, la plus forte gagne le pli et ouvre le pli suivant.</p>' +
     '<p>• <b>Poulpe</b> : en le jouant, tu choisis qu\'il est la carte la plus <b>grande</b> (il bat tout) ou la plus <b>petite</b> (il perd contre tout). Si plusieurs Poulpes sont joués en « plus » dans le même pli, le <b>dernier Poulpe « plus » posé gagne</b>. Un Poulpe « moins » perd contre tout.</p>' +
-    '<p>• Fin de manche : ceux qui n\'ont <b>pas gagné exactement</b> le nombre de plis annoncé (en plus ou en moins) prennent <b>une barre</b>.</p>' +
-    '<p>• Une <b>roue</b> désigne le prochain distributeur.</p>' +
+    '<p>• Fin de manche : chacun prend <b>une barre par pli d\'écart</b> avec son annonce, en plus ou en moins (ex. : 5 annoncés, 3 réalisés = 2 barres).</p>' +
+    '<p>• Une <b>roue</b> désigne le prochain distributeur. Celui qui a déjà distribué <b>sort de la roue</b> jusqu\'à ce que tout le monde ait distribué, puis un nouveau tour commence.</p>' +
     '<p>• Fin de partie : celui qui a le <b>plus de barres</b> perd. En cas d\'égalité, les joueurs concernés tirent une carte, et celui qui a le plus grand chiffre fait tourner la roue pour les autres. Dans tous les cas, une <b>roue de 1 à 30</b> est tournée à la fin pour le perdant.</p></div>' +
     '<button id="rx" class="primary" style="margin-top:10px">Compris !</button>');
   $('rx').onclick = closeOverlay;
@@ -334,7 +334,7 @@ function handleOverlays(s) {
   if (s.phase === 'roundEnd' && s.results && overlayKind !== 'wheel') {
     const last = s.round >= s.totalRounds;
     openOverlay('results', '<h2>Manche ' + s.round + ' terminée</h2><table class="res"><tr><th>Joueur</th><th>Annoncé</th><th>Pris</th><th></th></tr>' +
-      s.results.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + r.bid + '</td><td>' + r.won + '</td><td class="' + (r.ok ? 'okc' : 'koc') + '">' + (r.ok ? '✔ bravo' : '✖ +1 barre') + '</td></tr>').join('') +
+      s.results.map(r => '<tr><td>' + esc(r.name) + '</td><td>' + r.bid + '</td><td>' + r.won + '</td><td class="' + (r.ok ? 'okc' : 'koc') + '">' + (r.ok ? '✔ bravo' : '✖ +' + (r.bars || 1) + ' barre' + ((r.bars || 1) > 1 ? 's' : '')) + '</td></tr>').join('') +
       '</table><p style="color:var(--mut)">' + (last ? 'C\'était la dernière manche !' : 'La roue va désigner le prochain distributeur…') + '</p>');
   } else if (overlayKind === 'results' && s.phase !== 'roundEnd') closeOverlay();
   // fin de partie
