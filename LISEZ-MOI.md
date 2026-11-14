@@ -52,8 +52,10 @@ Plusieurs tables en même temps, aucun compte à créer pour jouer. Aucun argent
 - Le joueur à gauche du distributeur ouvre, la carte la plus forte gagne le pli et ouvre le suivant.
 - Un Poulpe se joue comme la carte la plus grande (bat tout) ou la plus petite (perd contre tout), au choix de celui qui le joue.
   Si plusieurs Poulpes sont joués en « plus » dans le même pli, le dernier Poulpe « plus » posé gagne.
-- Fin de manche : ceux qui n'ont pas gagné exactement le nombre de plis annoncé prennent une barre.
-  Une roue désigne le prochain distributeur.
+- Fin de manche : chacun prend une barre par pli d'écart avec son annonce, en plus ou en moins
+  (ex. : 5 annoncés, 3 réalisés = 2 barres).
+- Une roue désigne le prochain distributeur. Celui qui a déjà distribué sort de la roue jusqu'à ce que
+  tout le monde ait distribué, puis un nouveau tour commence (tout le monde revient, sauf le dernier distributeur).
 - Fin de partie (nombre de manches choisi par l'hôte, de 1 à 30) : celui qui a le plus de barres perd.
   En cas d'égalité, les joueurs concernés tirent une carte ; celui qui a le plus grand chiffre fait tourner la roue pour les autres.
   Dans tous les cas, une roue de 1 à 30 est ensuite tournée pour le perdant.
